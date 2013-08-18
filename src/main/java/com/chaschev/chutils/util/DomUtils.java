@@ -1,7 +1,13 @@
 package com.chaschev.chutils.util;
 
 import org.w3c.dom.*;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.*;
 
 import static org.w3c.dom.Node.ELEMENT_NODE;
@@ -257,6 +263,19 @@ public class DomUtils {
         }
         if (n == null) return null;
         return n;
+    }
+
+    public static Document parseXml(String s){
+        try {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            dbFactory.setIgnoringElementContentWhitespace(true);
+            dbFactory.setNamespaceAware(false);
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(new ByteArrayInputStream(s.getBytes()));
+            return doc;
+        } catch (Exception e) {
+            throw Exceptions.runtime(e);
+        }
     }
 }
 

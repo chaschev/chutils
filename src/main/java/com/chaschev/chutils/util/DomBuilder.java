@@ -2,6 +2,7 @@ package com.chaschev.chutils.util;
 
 import org.w3c.dom.*;
 
+import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -25,8 +26,14 @@ public class DomBuilder {
         }
     }
 
-    public Element root(){
-        return document.getDocumentElement();
+    public Node root(){
+        final Element el = document.getDocumentElement();
+
+        if(el == null){
+            return document;
+        }
+
+        return el;
     }
 
     public Element child(Element parent, String name){
@@ -47,6 +54,7 @@ public class DomBuilder {
 
     public DomBuilder() {
         builderFactory = DocumentBuilderFactory.newInstance();
+
         builderFactory.setValidating(false);
         builderFactory.setNamespaceAware(false);
         builderFactory.setCoalescing(false);
@@ -75,5 +83,9 @@ public class DomBuilder {
         final CDATASection section = document.createCDATASection(text);
         parent.appendChild(section);
         return section;
+    }
+
+    public String asString() {
+        return documentToString(document);
     }
 }
