@@ -1,11 +1,8 @@
 package com.chaschev.chutils.util;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import joptsimple.OptionSpec;
+import joptsimple.*;
+import joptsimple.internal.AbbreviationMap;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 
 /**
@@ -29,12 +26,18 @@ public class JOptOptions {
         return optionSet.valuesOf(optionSpec);
     }
 
-    public void printHelpOn(OutputStream sink)  {
-        try {
-            parser.printHelpOn(sink);
-        } catch (IOException e) {
-            throw Exceptions.runtime(e);
-        }
+    public String printHelpOn(){
+        return printHelpOn(160, 2);
+    }
+
+    public String printHelpOn(int desiredOverallWidth, int desiredColumnSeparatorWidth)  {
+//        try {
+        return new BuiltinHelpFormatter(desiredOverallWidth, desiredColumnSeparatorWidth).format(((AbbreviationMap)OpenBean2.getFieldValue2(
+            parser, "recognizedOptions")).toJavaUtilMap());
+//            parser.printHelpOn(sink);
+//        } catch (IOException e) {
+//            throw Exceptions.runtime(e);
+//        }
     }
 
     public boolean has(OptionSpec<?> optionSpec) {
