@@ -90,23 +90,53 @@ public class FileUtils {
         return reusableStream.toByteArray();
     }
 
-    public static String humanReadableByteCount(final long bytes, final boolean si) {
+    public static ByteCount humanReadableByteCount(final double bytes) {
+        return humanReadableByteCount(bytes, false);
+    }
+
+    public static ByteCount humanReadableByteCount(final double bytes, final boolean si) {
         return humanReadableByteCount(bytes, si, true);
     }
 
-    public static String humanReadableByteCount(final long bytes, final boolean si, boolean addByte) {
-        final int unit = si ? 1000 : 1024;
-        if (bytes < unit) return bytes + (addByte ? " B" : "");
-        final int exp = (int) (Math.log(bytes) / Math.log(unit));
-        final char pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1);
-        return
-            addByte ?
-                String.format("%.1f %cB", bytes / Math.pow(unit, exp), pre) :
-                String.format("%.1f%c", bytes / Math.pow(unit, exp), pre)
-            ;
+     public static class ByteCount{
+        final double bytes;
+        final double count;
+        final String unit;
+
+        public ByteCount(double bytes, final boolean si, final boolean addByte) {
+            this.bytes = bytes;
+
+            final int unitInt = si ? 1000 : 1024;
+            if (bytes < unitInt) {
+                this.count = bytes;
+                unit = (addByte ? " B" : "");
+                return;
+            }
+
+            final int exp = (int) (Math.log(bytes) / Math.log(unitInt));
+            final char pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1);
+
+            count = bytes / Math.pow(unitInt, exp);
+            unit = pre + (addByte ? "B" : "");
+        }
+
+        public String toString(int fractionLength) {
+            return String.format("%." +
+                fractionLength +
+                "f %s", count, unit);
+        }
+
+        @Override
+        public String toString() {
+            return toString(1);
+        }
     }
 
-    public static String humanReadableByteCount(long bytes) {
+    public static ByteCount humanReadableByteCount(long bytes) {
         return humanReadableByteCount(bytes, false);
+    }
+
+    public static ByteCount humanReadableByteCount(final double bytes, final boolean si, boolean addByte) {
+        return new ByteCount(bytes, si, addByte);
     }
 }
