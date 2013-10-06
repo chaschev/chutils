@@ -1,4 +1,4 @@
-package com.chaschev.chutils.util;
+package com.chaschev.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

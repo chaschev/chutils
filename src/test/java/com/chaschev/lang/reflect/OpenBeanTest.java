@@ -1,17 +1,22 @@
-package com.chaschev.chutils.util;
+package com.chaschev.lang.reflect;
 
+import com.chaschev.lang.OpenBean;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 
+import static com.chaschev.lang.OpenBean.getConstructorDesc;
+import static com.chaschev.lang.OpenBean.getStaticFieldValue;
+import static com.chaschev.lang.OpenBean.newInstance;
 import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * User: chaschev
  * Date: 2/25/13
  */
-public class OpenBean2Test {
+public class OpenBeanTest {
     public static class TestBean extends ArrayList{
         public static final String staticString = "ss1";
 
@@ -68,7 +73,7 @@ public class OpenBean2Test {
         copy2 = new Copy2();
         copy3 = new Copy3();
 
-        OpenBean2.copyFields(copy1, copy2);
+        OpenBean.copyFields(copy1, copy2);
 
         assertThat(copy1.s1).isEqualTo(new Copy1().s1);
         assertThat(copy2.s2).isEqualTo(new Copy2().s2);
@@ -78,7 +83,7 @@ public class OpenBean2Test {
         copy1 = new Copy1();
         copy3 = new Copy3();
 
-        OpenBean2.copyFields(copy1, copy3);
+        OpenBean.copyFields(copy1, copy3);
 
         assertThat(copy1.s1).isEqualTo(new Copy3().s1);
         assertThat(copy3.s1).isEqualTo(new Copy3().s1);
@@ -90,7 +95,7 @@ public class OpenBean2Test {
         copy2 = new Copy2();
         copy3 = new Copy3();
 
-        OpenBean2.copyFields(copy3, copy1);
+        OpenBean.copyFields(copy3, copy1);
 
         assertThat(copy1.s1).isEqualTo(new Copy1().s1);
         assertThat(copy3.s1).isEqualTo(new Copy1().s1);
@@ -107,13 +112,13 @@ public class OpenBean2Test {
         HashMap<String, String> map;
         map = new HashMap<String, String>();
         map.put("s2", "Copy2s2");
-        OpenBean2.copyFields(copy1, map);
+        OpenBean.copyFields(copy1, map);
 
         assertThat(copy1.s1).isEqualTo(new Copy1().s1);
 
         map = new HashMap<String, String>();
         map.put("s1", "v3");
-        OpenBean2.copyFields(copy1, map);
+        OpenBean.copyFields(copy1, map);
 
         assertThat(copy1.s1).isEqualTo("v3");
 
@@ -121,6 +126,27 @@ public class OpenBean2Test {
 
     @Test
     public void testStatic() throws Exception {
-        assertThat(OpenBean2.getStaticFieldValue(TestBean.class, "staticString")).isEqualTo("ss1");
+        assertThat(getStaticFieldValue(TestBean.class, "staticString")).isEqualTo("ss1");
+    }
+
+    @Test
+    public void testNewInstance() throws Exception {
+        assertThat(newInstance(Mock.class, new ArrayList()).c).isEqualTo(1);
+        assertThat(newInstance(Mock.class, true, new ArrayList()).c).isEqualTo(1);
+        assertThat(newInstance(Mock.class, false, new LinkedList()).c).isEqualTo(3);
+        assertThat(newInstance(Mock.class, new LinkedList()).c).isEqualTo(3);
+        assertThat(newInstance(Mock.class, new LinkedList(), new ArrayList()).c).isEqualTo(2);
+
+        assertThat(getConstructorDesc(Mock.class, true, new LinkedList())).isNull();
+        assertThat(getConstructorDesc(Mock.class, true, LinkedList.class)).isNull();
+
+        assertThat(getConstructorDesc(Mock.class, false, new LinkedList())).isNotNull();
+        assertThat(getConstructorDesc(Mock.class, false, LinkedList.class)).isNotNull();
+
+        assertThat(getConstructorDesc(Mock.class, new LinkedList())).isNotNull();
+        assertThat(getConstructorDesc(Mock.class, LinkedList.class)).isNotNull();
+
+        assertThat(getConstructorDesc(Mock.class, true, new ArrayList(), new LinkedList())).isNull();
+        assertThat(getConstructorDesc(Mock.class, true, ArrayList.class, LinkedList.class)).isNull();
     }
 }

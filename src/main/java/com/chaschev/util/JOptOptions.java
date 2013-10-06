@@ -1,5 +1,6 @@
-package com.chaschev.chutils.util;
+package com.chaschev.util;
 
+import com.chaschev.lang.OpenBean;
 import joptsimple.*;
 import joptsimple.internal.AbbreviationMap;
 
@@ -32,7 +33,7 @@ public class JOptOptions {
 
     public String printHelpOn(int desiredOverallWidth, int desiredColumnSeparatorWidth)  {
 //        try {
-        return new BuiltinHelpFormatter(desiredOverallWidth, desiredColumnSeparatorWidth).format(((AbbreviationMap)OpenBean2.getFieldValue2(
+        return new BuiltinHelpFormatter(desiredOverallWidth, desiredColumnSeparatorWidth).format(((AbbreviationMap) OpenBean.getFieldValue2(
             parser, "recognizedOptions")).toJavaUtilMap());
 //            parser.printHelpOn(sink);
 //        } catch (IOException e) {

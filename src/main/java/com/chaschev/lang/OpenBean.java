@@ -1,32 +1,22 @@
-package com.chaschev.chutils.util;
+package com.chaschev.lang;
 
-import javax.annotation.Nullable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import com.chaschev.lang.reflect.ClassDesc;
+import com.chaschev.lang.reflect.ConstructorDesc;
+import com.chaschev.util.Exceptions;
+
+import java.lang.reflect.*;
 import java.util.*;
 
 /**
  * User: chaschev
  * Date: 5/20/13
  */
-public class OpenBean2 {
-    private static final Comparator<Method> METHOD_COMPARATOR = new Comparator<Method>() {
-        @Override
-        public int compare(Method o1, Method o2) {
-            return o1.getName().compareTo(o2.getName());
-        }
-    };
-    private static final Comparator<Field> FIELD_COMPARATOR = new Comparator<Field>() {
-        @Override
-        public int compare(Field o1, Field o2) {
-            return o1.getName().compareTo(o2.getName());
-        }
-    };
+public class OpenBean {
+
 
     public static Map<String, Object> putAll(Map<String, Object> dest, Object src) {
         try {
-            for (Field field : OpenBean2.getClassDesc(src.getClass()).fields) {
+            for (Field field : OpenBean.getClassDesc(src.getClass()).fields) {
                 final Object v = field.get(src);
 
                 dest.put(field.getName(), v);
@@ -40,10 +30,10 @@ public class OpenBean2 {
 
     public static Object putAll(Object dest, Map<String, Object> src) {
         try {
-            for (Field field : OpenBean2.getClassDesc(dest.getClass()).fields) {
+            for (Field field : OpenBean.getClassDesc(dest.getClass()).fields) {
                 final String name = field.getName();
 
-                if(src.containsKey(name)){
+                if (src.containsKey(name)) {
                     final Object v = src.get(name);
                     field.set(dest, v);
                 }
@@ -55,108 +45,10 @@ public class OpenBean2 {
         }
     }
 
-    public static class ClassDesc {
-        Class aClass;
-
-        //this is 1.5-2x faster than List
-        public final Field[] fields;
-        public final Field[] staticFields;
-        public final Method[] methods;
-
-        private ClassDesc(Class aClass) {
-            this.aClass = aClass;
-
-            List<Field> tempFields = new ArrayList<Field>();
-            List<Field> tempStaticFields = new ArrayList<Field>();
-            List<Method> tempMethods = new ArrayList<Method>();
-
-            while (aClass != Object.class) {
-                Field[] fields = aClass.getDeclaredFields();
-
-                for (Field field : fields) {
-                    field.setAccessible(true);
-                    final int modifiers = field.getModifiers();
-                    if(Modifier.isStatic(modifiers)){
-                        tempStaticFields.add(field);
-                    }else{
-                        tempFields.add(field);
-                    }
-                }
-
-                final Method[] methods = aClass.getDeclaredMethods();
-
-                for (Method method : methods) {
-                    method.setAccessible(true);
-                    tempMethods.add(method);
-                }
-
-                aClass = aClass.getSuperclass();
-            }
-
-            tempFields.toArray(this.fields = new Field[tempFields.size()]);
-            tempStaticFields.toArray(this.staticFields = new Field[tempStaticFields.size()]);
-            tempMethods.toArray(this.methods = new Method[tempMethods.size()]);
-
-            Arrays.sort(this.fields, FIELD_COMPARATOR);
-            Arrays.sort(this.staticFields, FIELD_COMPARATOR);
-            Arrays.sort(this.methods, METHOD_COMPARATOR);
-
-        }
-
-        @SuppressWarnings("ForLoopReplaceableByForEach")
-        @Nullable
-        public Field getField(String name) {
-            return findField(fields, name);
-        }
-
-        @SuppressWarnings("ForLoopReplaceableByForEach")
-        @Nullable
-        public Field getStaticField(String name) {
-            return findField(staticFields, name);
-        }
-
-        @Nullable
-        private static Field findField(Field[] array, String name) {
-            final int n = array.length;
-
-            for (int i = 0; i < n; i++) {
-                Field field = array[i];
-                if (field.getName().equals(name)) {
-                    return field;
-                }
-            }
-
-            return null;
-        }
-
-        public Method getMethod(String name) {
-            final int n = methods.length;
-            for (int i = 0; i < n; i++) {
-                Method method = methods[i];
-                if (method.getName().equals(name)) {
-                    return method;
-                }
-            }
-
-            return null;
-        }
-    }
-
-    private static final Map<Class, ClassDesc> CLASS_DESC_MAP = new HashMap<Class, ClassDesc>();
-
     static final Map<Class, Map<String, Field>> fieldMap = new HashMap<Class, Map<String, Field>>();
 
-    public static ClassDesc getClassDesc(Class aClass) {
-        ClassDesc result = CLASS_DESC_MAP.get(aClass);
-
-        if (result == null) {
-            result = new ClassDesc(aClass);
-            synchronized (CLASS_DESC_MAP) {
-                CLASS_DESC_MAP.put(aClass, result);
-            }
-        }
-
-        return result;
+    public static <T> ClassDesc<T> getClassDesc(Class<T> aClass) {
+        return ClassDesc.getClassDesc(aClass);
     }
 
     public static Object getFieldValue(Object object, String fieldName) {
@@ -186,13 +78,11 @@ public class OpenBean2 {
             if (value == null) {
                 if (List.class.isAssignableFrom(aClass)) {
                     value = new ArrayList();
-                }else
-                if (Set.class.isAssignableFrom(aClass)) {
+                } else if (Set.class.isAssignableFrom(aClass)) {
                     value = new HashSet();
-                }else
-                if (Map.class.isAssignableFrom(aClass)){
+                } else if (Map.class.isAssignableFrom(aClass)) {
                     value = new HashMap();
-                }else{
+                } else {
                     throw new IllegalStateException("could not init collection/map for field: " + fieldName + " of class " + object.getClass());
                 }
 
@@ -209,7 +99,7 @@ public class OpenBean2 {
         return getClassDesc(object.getClass()).getField(fieldName);
     }
 
-    public static void setField(Object object, String fieldName, Object value){
+    public static void setField(Object object, String fieldName, Object value) {
         try {
             getField2(object, fieldName).set(object, value);
         } catch (IllegalAccessException e) {
@@ -271,19 +161,19 @@ public class OpenBean2 {
         copyFields(dest, src, DEFAULT_HANDLER);
     }
 
-    public static abstract class CustomCopyHandler{
-        public boolean handle(Field field1, Field field2, Object dest, Object src, String name) throws Exception{
+    public static abstract class CustomCopyHandler {
+        public boolean handle(Field field1, Field field2, Object dest, Object src, String name) throws Exception {
             return handle(field1, field2.get(dest), src, name);
         }
 
-        public boolean handle(Field destField, Object srcValue, Object dest, String name) throws Exception{
+        public boolean handle(Field destField, Object srcValue, Object dest, String name) throws Exception {
             throw new UnsupportedOperationException("todo");
         }
     }
 
-    private static final CustomCopyHandler DEFAULT_HANDLER = new CustomCopyHandler(){
+    private static final CustomCopyHandler DEFAULT_HANDLER = new CustomCopyHandler() {
         @Override
-        public final boolean handle(Field field1, Field field2, Object dest, Object src, String name) throws Exception{
+        public final boolean handle(Field field1, Field field2, Object dest, Object src, String name) throws Exception {
             field1.set(dest, field2.get(src));
             return true;
         }
@@ -291,8 +181,8 @@ public class OpenBean2 {
         @Override
         public boolean handle(Field destField, Object dest, Object srcValue, String name) throws Exception {
             final Class<?> destClass = destField.getType();
-            if(destClass.isEnum() && srcValue instanceof String){
-                srcValue = Enum.valueOf((Class<Enum>)destClass, (String)srcValue);
+            if (destClass.isEnum() && srcValue instanceof String) {
+                srcValue = Enum.valueOf((Class<Enum>) destClass, (String) srcValue);
             }
             try {
                 destField.set(dest, srcValue);
@@ -303,7 +193,7 @@ public class OpenBean2 {
         }
     };
 
-    public static void copyFields(Object dest, Map<String,?> src, final CustomCopyHandler handler) {
+    public static void copyFields(Object dest, Map<String, ?> src, final CustomCopyHandler handler) {
         final ClassDesc destClassDesc = getClassDesc(dest.getClass());
 
         try {
@@ -311,13 +201,13 @@ public class OpenBean2 {
                 final String name = (String) entry.getKey();
                 final Field destField = destClassDesc.getField(name);
 
-                if(destField == null){
+                if (destField == null) {
                     continue;
                 }
 
                 final Object srcValue = entry.getValue();
 
-                if(!(handler != null && handler.handle(destField, dest, srcValue, name))){
+                if (!(handler != null && handler.handle(destField, dest, srcValue, name))) {
                     DEFAULT_HANDLER.handle(destField, dest, srcValue, name);
                 }
             }
@@ -371,11 +261,11 @@ public class OpenBean2 {
         return object instanceof Class;
     }
 
-    public static Object getStaticFieldValue(Class aClass, String name){
+    public static Object getStaticFieldValue(Class aClass, String name) {
         try {
-            final Field field = OpenBean2.getClassDesc(aClass).getStaticField(name);
+            final Field field = OpenBean.getClassDesc(aClass).getStaticField(name);
 
-            if(field == null){
+            if (field == null) {
                 throw new RuntimeException("no such field '" + name + "' " + " in class " + aClass);
             }
 
@@ -385,11 +275,11 @@ public class OpenBean2 {
         }
     }
 
-    public static Object getStaticMethodValue(Class aClass, String name, Object... args){
+    public static Object getStaticMethodValue(Class aClass, String name, Object... args) {
         try {
-            final Method field = OpenBean2.getClassDesc(aClass).getMethod(name);
+            final Method field = OpenBean.getClassDesc(aClass).getMethod(name);
 
-            if(field == null){
+            if (field == null) {
                 throw new RuntimeException("no such field '" + name + "' " + " in class " + aClass);
             }
 
@@ -398,4 +288,29 @@ public class OpenBean2 {
             throw Exceptions.runtime(e);
         }
     }
+
+    public static <T> T newInstance(Class<T> aClass, Object... params) {
+        return newInstance(aClass, false, params);
+    }
+
+    public static <T> T newInstance(Class<T> aClass, boolean strictly, Object... params){
+        return getConstructorDesc(aClass, strictly, params).newInstance(params);
+    }
+
+    public static <T> ConstructorDesc<T> getConstructorDesc(Class<T> aClass, Object... params) {
+        return getConstructorDesc(aClass, false, params);
+    }
+
+    public static <T> ConstructorDesc<T> getConstructorDesc(Class<T> aClass, boolean strictly, Object... params) {
+        return getClassDesc(aClass).getConstructorDesc(strictly, params);
+    }
+
+    public static <T> ConstructorDesc<T> getConstructorDesc(Class<T> aClass, Class... classes) {
+        return getConstructorDesc(aClass, false, classes);
+    }
+
+    public static <T> ConstructorDesc<T> getConstructorDesc(Class<T> aClass, boolean strictly, Class... classes) {
+        return getClassDesc(aClass).getConstructorDesc(strictly, classes);
+    }
+
 }

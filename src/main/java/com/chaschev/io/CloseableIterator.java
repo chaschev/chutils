@@ -1,4 +1,4 @@
-package com.chaschev.chutils.io;
+package com.chaschev.io;
 
 import java.io.Closeable;
 import java.util.Iterator;

@@ -1,4 +1,4 @@
-package com.chaschev.chutils.concurrent;
+package com.chaschev.concurrent;
 
 import java.util.Collection;
 import java.util.List;

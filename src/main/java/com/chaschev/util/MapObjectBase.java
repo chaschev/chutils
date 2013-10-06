@@ -1,4 +1,4 @@
-package com.chaschev.chutils.util;
+package com.chaschev.util;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterators;

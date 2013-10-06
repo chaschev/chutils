@@ -16,9 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.chaschev.chutils.io;
+package com.chaschev.io;
 
-import com.chaschev.chutils.util.Exceptions;
+import com.chaschev.util.Exceptions;
 
 import java.io.DataInput;
 import java.io.DataOutput;

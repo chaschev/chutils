@@ -1,4 +1,4 @@
-package com.chaschev.chutils.util;
+package com.chaschev.util;
 
 /**
  * User: chaschev
@@ -6,8 +6,15 @@ package com.chaschev.chutils.util;
  */
 public class Exceptions {
 
-    public static RuntimeException runtime(Error e) {
+    public static RuntimeException runtime(Throwable e) {
+        if (e instanceof RuntimeException) {
+            return (RuntimeException)e;
+        }
+
         return new RuntimeException(e);
+    }
+    public static Error runtime(Error e) {
+        return e;
     }
     public static RuntimeException runtime(Exception e) {
         if (RuntimeException.class.isAssignableFrom(e.getClass())) {

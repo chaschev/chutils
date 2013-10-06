@@ -1,5 +1,7 @@
 package com.chaschev.chutils.util;
 
+import com.chaschev.util.DomUtils;
+import com.chaschev.util.JsonXML;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;

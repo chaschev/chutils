@@ -1,4 +1,4 @@
-package com.chaschev.chutils.util;
+package com.chaschev.util;
 
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;

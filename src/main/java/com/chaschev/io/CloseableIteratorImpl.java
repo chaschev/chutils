@@ -1,4 +1,4 @@
-package com.chaschev.chutils.io;
+package com.chaschev.io;
 
 import java.io.IOException;
 import java.util.Iterator;

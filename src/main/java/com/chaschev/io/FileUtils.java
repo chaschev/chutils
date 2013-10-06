@@ -1,4 +1,4 @@
-package com.chaschev.chutils.io;
+package com.chaschev.io;
 
 import org.apache.commons.io.IOUtils;
 

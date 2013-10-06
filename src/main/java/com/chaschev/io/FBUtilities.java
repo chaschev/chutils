@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.chaschev.chutils.io;
+package com.chaschev.io;
 
 import java.lang.reflect.Constructor;
 
