@@ -1,4 +1,4 @@
-import com.chaschev.chutils.Main;
+import chaschev.chutils.Main;
 
 import java.util.Collections;
 import java.util.List;
