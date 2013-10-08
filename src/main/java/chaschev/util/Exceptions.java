@@ -1,5 +1,8 @@
 package chaschev.util;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 /**
  * User: chaschev
  * Date: 31/03/12
@@ -26,5 +29,12 @@ public class Exceptions {
 
     public static RuntimeException runtime(String message, Exception cause) {
         return new RuntimeException(message, cause);
+    }
+
+    public static String toString(Throwable e){
+        StringWriter sw = new StringWriter(e.getStackTrace().length * 64);
+        e.printStackTrace(new PrintWriter(sw));
+
+        return sw.toString();
     }
 }

@@ -2,10 +2,10 @@ package chaschev.lang;
 
 import chaschev.lang.reflect.ClassDesc;
 import chaschev.lang.reflect.ConstructorDesc;
+import chaschev.lang.reflect.MethodDesc;
 import chaschev.util.Exceptions;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -220,16 +220,46 @@ public class OpenBean {
         }
     }
 
-    public static Object getStaticMethodValue(Class aClass, String name, Object... args) {
+    public static Object invokeStatic(Class aClass, String name, Object... args) {
         try {
-            final Method field = OpenBean.getClassDesc(aClass).getMethod(name);
+            final MethodDesc method = OpenBean.getClassDesc(aClass).getStaticMethodDesc(false, name, true);
 
-            if (field == null) {
-                throw new RuntimeException("no such field '" + name + "' " + " in class " + aClass);
+            if (method == null) {
+                throw new RuntimeException("no such method '" + name + "' " + " in class " + aClass);
             }
 
-            return field.invoke(aClass, args);
+            return method.invoke(args);
         } catch (Exception e) {
+            throw Exceptions.runtime(e);
+        }
+    }
+
+    public static Object invoke(Object object, String name, Object... args) {
+        try {
+            final MethodDesc method = OpenBean.getClassDesc(object.getClass()).getMethodDesc(false, name, true);
+
+            if (method == null) {
+                throw new RuntimeException("no such method '" + name + "' " + " in object " + object.getClass());
+            }
+
+            return method.invoke(args);
+        } catch (Exception e) {
+            throw Exceptions.runtime(e);
+        }
+    }
+
+    public static Object newByClass(String className, Object... params) {
+        try {
+            return newInstance(Class.forName(className), params);
+        } catch (ClassNotFoundException e) {
+            throw Exceptions.runtime(e);
+        }
+    }
+
+    public static Object newByClass(String className, boolean strictly, Object... params) {
+        try {
+            return newInstance(Class.forName(className), strictly, params);
+        } catch (ClassNotFoundException e) {
             throw Exceptions.runtime(e);
         }
     }
@@ -239,7 +269,16 @@ public class OpenBean {
     }
 
     public static <T> T newInstance(Class<T> aClass, boolean strictly, Object... params){
-        return getConstructorDesc(aClass, strictly, params).newInstance(params);
+        ConstructorDesc<T> desc = getConstructorDesc(aClass, strictly, params);
+
+        if(desc == null){
+            throw new chaschev.lang.reflect.NoSuchMethodException("constructor not found" +
+                ", class = " +aClass.getSimpleName() +
+                ", strict = " + strictly +
+                ", params = " + Arrays.asList(params));
+        }
+
+        return desc.newInstance(params);
     }
 
     public static <T> ConstructorDesc<T> getConstructorDesc(Class<T> aClass, Object... params) {
@@ -258,4 +297,5 @@ public class OpenBean {
         return getClassDesc(aClass).getConstructorDesc(strictly, classes);
     }
 
+    public static final OpenBeanInstance INSTANCE = new OpenBeanInstance();
 }

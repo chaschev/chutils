@@ -1,5 +1,7 @@
 package chaschev.lang.reflect;
 
+import com.google.common.base.Preconditions;
+
 import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -15,6 +17,8 @@ public class ClassDesc<T> {
     Class<T> aClass;
 
     public static <T> ClassDesc<T> getClassDesc(Class<T> aClass) {
+        Preconditions.checkNotNull(aClass, "class must not be null");
+
         ClassDesc result = CLASS_DESC_MAP.get(aClass);
 
         if (result == null) {
@@ -30,7 +34,8 @@ public class ClassDesc<T> {
     //this is 1.5-2x faster than List
     public final Field[] fields;
     public final Field[] staticFields;
-    public final Method[] methods;
+    public final MethodDesc[] staticMethods;
+    public final MethodDesc[] methods;
     public final ConstructorDesc[] constructors;
 
     ClassDesc(Class aClass) {
@@ -39,6 +44,7 @@ public class ClassDesc<T> {
         List<Field> tempFields = new ArrayList<Field>();
         List<Field> tempStaticFields = new ArrayList<Field>();
         List<Method> tempMethods = new ArrayList<Method>();
+        List<Method> tempStaticMethods = new ArrayList<Method>();
 
         Constructor[] constructors = aClass.getConstructors();
         this.constructors = new ConstructorDesc[constructors.length];
@@ -65,7 +71,13 @@ public class ClassDesc<T> {
 
             for (Method method : methods) {
                 method.setAccessible(true);
-                tempMethods.add(method);
+                final int modifiers = method.getModifiers();
+
+                if (Modifier.isStatic(modifiers)) {
+                    tempStaticMethods.add(method);
+                } else {
+                    tempMethods.add(method);
+                }
             }
 
             aClass = aClass.getSuperclass();
@@ -73,12 +85,22 @@ public class ClassDesc<T> {
 
         tempFields.toArray(this.fields = new Field[tempFields.size()]);
         tempStaticFields.toArray(this.staticFields = new Field[tempStaticFields.size()]);
-        tempMethods.toArray(this.methods = new Method[tempMethods.size()]);
+
+        this.methods = new MethodDesc[tempMethods.size()];
+        this.staticMethods = new MethodDesc[tempStaticMethods.size()];
+
+        for (int i = 0; i < tempMethods.size(); i++) {
+            this.methods[i] = new MethodDesc(tempMethods.get(i));
+        }
+
+        for (int i = 0; i < tempStaticMethods.size(); i++) {
+            this.staticMethods[i] = new MethodDesc(tempStaticMethods.get(i));
+        }
 
         Arrays.sort(this.fields, FIELD_COMPARATOR);
         Arrays.sort(this.staticFields, FIELD_COMPARATOR);
         Arrays.sort(this.methods, METHOD_COMPARATOR);
-
+        Arrays.sort(this.staticMethods, METHOD_COMPARATOR);
     }
 
     @SuppressWarnings("ForLoopReplaceableByForEach")
@@ -107,11 +129,13 @@ public class ClassDesc<T> {
         return null;
     }
 
-    public Method getMethod(String name) {
+
+
+    private MethodDesc getMethodQuickly(String name, MethodDesc[] methods) {
         final int n = methods.length;
         for (int i = 0; i < n; i++) {
-            Method method = methods[i];
-            if (method.getName().equals(name)) {
+            MethodDesc method = methods[i];
+            if (method.method.getName().equals(name)) {
                 return method;
             }
         }
@@ -120,32 +144,33 @@ public class ClassDesc<T> {
     }
 
     public ConstructorDesc<T> getConstructorDesc(final boolean strictly, Class... parameters) {
-        if (strictly) {
-            for (ConstructorDesc constructor : constructors) {
-                if (constructor.matchesStrictly(parameters)) {
-                    return constructor;
-                }
-            }
-        } else {
-            for (ConstructorDesc constructor : constructors) {
-                if (constructor.matches(parameters)) {
-                    return constructor;
-                }
-            }
-        }
-
-        return null;
+        return (ConstructorDesc<T>) getConstructorDesc(strictly, constructors, parameters);
     }
 
     public ConstructorDesc<T> getConstructorDesc(final boolean strictly, Object... parameters) {
+        return (ConstructorDesc<T>) getConstructorDesc(strictly, constructors, parameters);
+    }
+
+    /**
+     * @param strictly Strictly = false, slower, but normal java matching.
+     */
+    public MethodDesc getMethodDesc(final boolean strictly, Object... parameters) {
+        return (MethodDesc) getConstructorDesc(strictly, methods, parameters);
+    }
+
+    public MethodDesc getStaticMethodDesc(final boolean strictly, Object... parameters) {
+        return (MethodDesc) getConstructorDesc(strictly, staticMethods, parameters);
+    }
+
+    public HavingMethodSignature getConstructorDesc(final boolean strictly, HavingMethodSignature[] constructors, Class... parameters) {
         if (strictly) {
-            for (ConstructorDesc constructor : constructors) {
+            for (HavingMethodSignature constructor : constructors) {
                 if (constructor.matchesStrictly(parameters)) {
                     return constructor;
                 }
             }
         } else {
-            for (ConstructorDesc constructor : constructors) {
+            for (HavingMethodSignature constructor : constructors) {
                 if (constructor.matches(parameters)) {
                     return constructor;
                 }
@@ -155,10 +180,28 @@ public class ClassDesc<T> {
         return null;
     }
 
-    private static final Comparator<Method> METHOD_COMPARATOR = new Comparator<Method>() {
+    public HavingMethodSignature getConstructorDesc(final boolean strictly, HavingMethodSignature[] constructors, Object... parameters) {
+        if (strictly) {
+            for (HavingMethodSignature constructor : constructors) {
+                if (constructor.matchesStrictly(parameters)) {
+                    return constructor;
+                }
+            }
+        } else {
+            for (HavingMethodSignature constructor : constructors) {
+                if (constructor.matches(parameters)) {
+                    return constructor;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static final Comparator<MethodDesc> METHOD_COMPARATOR = new Comparator<MethodDesc>() {
         @Override
-        public int compare(Method o1, Method o2) {
-            return o1.getName().compareTo(o2.getName());
+        public int compare(MethodDesc o1, MethodDesc o2) {
+            return o1.method.getName().compareTo(o1.method.getName());
         }
     };
     private static final Comparator<Field> FIELD_COMPARATOR = new Comparator<Field>() {
@@ -167,4 +210,13 @@ public class ClassDesc<T> {
             return o1.getName().compareTo(o2.getName());
         }
     };
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("ClassDesc{");
+        sb.append("aClass=").append(aClass.getSimpleName());
+        sb.append(", fields=").append(Arrays.toString(fields));
+        sb.append('}');
+        return sb.toString();
+    }
 }
