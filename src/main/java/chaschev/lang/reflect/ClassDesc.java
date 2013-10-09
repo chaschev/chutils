@@ -144,35 +144,43 @@ public class ClassDesc<T> {
     }
 
     public ConstructorDesc<T> getConstructorDesc(final boolean strictly, Class... parameters) {
-        return (ConstructorDesc<T>) getConstructorDesc(strictly, constructors, parameters);
+        return (ConstructorDesc<T>) findSignature(null, strictly, constructors, parameters);
     }
 
     public ConstructorDesc<T> getConstructorDesc(final boolean strictly, Object... parameters) {
-        return (ConstructorDesc<T>) getConstructorDesc(strictly, constructors, parameters);
+        return (ConstructorDesc<T>) findSignature(null, strictly, constructors, parameters);
     }
 
     /**
      * @param strictly Strictly = false, slower, but normal java matching.
      */
-    public MethodDesc getMethodDesc(final boolean strictly, Object... parameters) {
-        return (MethodDesc) getConstructorDesc(strictly, methods, parameters);
+    public MethodDesc getMethodDesc(String name,final boolean strictly, Object... parameters) {
+        return (MethodDesc) findSignature(name, strictly, methods, parameters);
     }
 
-    public MethodDesc getStaticMethodDesc(final boolean strictly, Object... parameters) {
-        return (MethodDesc) getConstructorDesc(strictly, staticMethods, parameters);
+    public MethodDesc getStaticMethodDesc(String name, final boolean strictly, Object... parameters) {
+        return (MethodDesc) findSignature(name, strictly, staticMethods, parameters);
     }
 
-    public HavingMethodSignature getConstructorDesc(final boolean strictly, HavingMethodSignature[] constructors, Class... parameters) {
+    protected HavingMethodSignature findSignature(@Nullable String name, final boolean strictly, HavingMethodSignature[] signatures, Class[] parameters) {
         if (strictly) {
-            for (HavingMethodSignature constructor : constructors) {
-                if (constructor.matchesStrictly(parameters)) {
-                    return constructor;
+            for (HavingMethodSignature signature : signatures) {
+                if(name != null && !name.equals(signature.getName())){
+                    continue;
+                }
+
+                if (signature.matchesStrictly(parameters)) {
+                    return signature;
                 }
             }
         } else {
-            for (HavingMethodSignature constructor : constructors) {
-                if (constructor.matches(parameters)) {
-                    return constructor;
+            for (HavingMethodSignature signature : signatures) {
+                if(name != null && !name.equals(signature.getName())){
+                    continue;
+                }
+
+                if (signature.matches(parameters)) {
+                    return signature;
                 }
             }
         }
@@ -180,17 +188,25 @@ public class ClassDesc<T> {
         return null;
     }
 
-    public HavingMethodSignature getConstructorDesc(final boolean strictly, HavingMethodSignature[] constructors, Object... parameters) {
+    protected  HavingMethodSignature findSignature(@Nullable String name, final boolean strictly, HavingMethodSignature[] methodSignatures, Object[] parameters) {
         if (strictly) {
-            for (HavingMethodSignature constructor : constructors) {
-                if (constructor.matchesStrictly(parameters)) {
-                    return constructor;
+            for (HavingMethodSignature signature : methodSignatures) {
+                if(name != null && !name.equals(signature.getName())){
+                    continue;
+                }
+
+                if (signature.matchesStrictly(parameters)) {
+                    return signature;
                 }
             }
         } else {
-            for (HavingMethodSignature constructor : constructors) {
-                if (constructor.matches(parameters)) {
-                    return constructor;
+            for (HavingMethodSignature signature : methodSignatures) {
+                if(name != null && !name.equals(signature.getName())){
+                    continue;
+                }
+
+                if (signature.matches(parameters)) {
+                    return signature;
                 }
             }
         }

@@ -5,7 +5,7 @@ import java.util.Arrays;
 /**
  * @author Andrey Chaschev chaschev@gmail.com
  */
-public class HavingMethodSignature {
+public abstract class HavingMethodSignature {
     protected final Class<?>[] params;
 
     public HavingMethodSignature(Class<?>[] params) {
@@ -54,5 +54,32 @@ public class HavingMethodSignature {
 
     private boolean checkLength(Object[] parameters) {
         return params.length == parameters.length;
+    }
+
+    public abstract String getName() ;
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder(128)
+            .append(getName()).append("(");
+        int l = params.length;
+
+        for (int i = 0; i < l; i++) {
+            Class<?> param = params[i];
+            sb.append(param.getSimpleName());
+            if(i-1 != l){
+                sb.append(", ");
+            }
+        }
+        sb.append(")");
+
+        boolean isMethod = this instanceof MethodDesc;
+
+        if(isMethod) sb.append(":");
+
+        sb.append(isMethod ? (((MethodDesc) this).method.getReturnType()
+            .getSimpleName()) : "");
+
+        return sb.toString();
     }
 }

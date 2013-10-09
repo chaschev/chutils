@@ -23,4 +23,9 @@ public class ConstructorDesc<T> extends HavingMethodSignature {
             throw Exceptions.runtime(e);
         }
     }
+
+    @Override
+    public String getName() {
+        return "<init>";
+    }
 }

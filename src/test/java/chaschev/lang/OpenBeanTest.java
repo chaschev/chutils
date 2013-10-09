@@ -1,6 +1,5 @@
 package chaschev.lang;
 
-import chaschev.lang.OpenBean;
 import chaschev.lang.reflect.Mock;
 import org.fest.assertions.Assertions;
 import org.junit.Test;
@@ -9,9 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import static chaschev.lang.OpenBean.getConstructorDesc;
-import static chaschev.lang.OpenBean.getStaticFieldValue;
-import static chaschev.lang.OpenBean.newInstance;
+import static chaschev.lang.OpenBean.*;
 import static org.fest.assertions.Assertions.assertThat;
 
 /**

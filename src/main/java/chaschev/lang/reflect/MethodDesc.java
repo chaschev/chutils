@@ -16,11 +16,19 @@ public class MethodDesc extends HavingMethodSignature {
         method.setAccessible(true);
     }
 
-    public Object invoke(Object[] params) {
+    public Object invoke(Object object, Object[] params) {
         try {
-            return method.invoke(params);
+            return method.invoke(object, params);
         } catch (Exception e) {
             throw Exceptions.runtime(e);
         }
+    }
+
+    public final String getName() {
+        return method.getName();
+    }
+
+    public Method getMethod() {
+        return method;
     }
 }

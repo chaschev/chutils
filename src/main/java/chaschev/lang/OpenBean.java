@@ -222,13 +222,13 @@ public class OpenBean {
 
     public static Object invokeStatic(Class aClass, String name, Object... args) {
         try {
-            final MethodDesc method = OpenBean.getClassDesc(aClass).getStaticMethodDesc(false, name, true);
+            final MethodDesc method = OpenBean.getClassDesc(aClass).getStaticMethodDesc(name, false, true);
 
             if (method == null) {
                 throw new RuntimeException("no such method '" + name + "' " + " in class " + aClass);
             }
 
-            return method.invoke(args);
+            return method.invoke(aClass, args);
         } catch (Exception e) {
             throw Exceptions.runtime(e);
         }
@@ -236,13 +236,13 @@ public class OpenBean {
 
     public static Object invoke(Object object, String name, Object... args) {
         try {
-            final MethodDesc method = OpenBean.getClassDesc(object.getClass()).getMethodDesc(false, name, true);
+            final MethodDesc method = OpenBean.getClassDesc(object.getClass()).getMethodDesc(name, false, args);
 
             if (method == null) {
                 throw new RuntimeException("no such method '" + name + "' " + " in object " + object.getClass());
             }
 
-            return method.invoke(args);
+            return method.invoke(object, args);
         } catch (Exception e) {
             throw Exceptions.runtime(e);
         }
