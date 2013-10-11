@@ -46,7 +46,7 @@ public class ClassDesc<T> {
         List<Method> tempMethods = new ArrayList<Method>();
         List<Method> tempStaticMethods = new ArrayList<Method>();
 
-        Constructor[] constructors = aClass.getConstructors();
+        Constructor[] constructors = aClass.getDeclaredConstructors();
         this.constructors = new ConstructorDesc[constructors.length];
 
         for (int i = 0; i < constructors.length; i++) {
@@ -234,5 +234,15 @@ public class ClassDesc<T> {
         sb.append(", fields=").append(Arrays.toString(fields));
         sb.append('}');
         return sb.toString();
+    }
+
+    public T newInstance(Object... params){
+        ConstructorDesc<T> constructorDesc = getConstructorDesc(false, params);
+
+        if(constructorDesc == null){
+            throw new IllegalArgumentException("constructor not found for params: " + Arrays.asList(params));
+        }
+
+        return constructorDesc.newInstance(params);
     }
 }

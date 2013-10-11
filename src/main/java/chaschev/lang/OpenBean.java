@@ -273,7 +273,7 @@ public class OpenBean {
 
         if(desc == null){
             throw new chaschev.lang.reflect.NoSuchMethodException("constructor not found" +
-                ", class = " +aClass.getSimpleName() +
+                ", class = " + aClass.getSimpleName() +
                 ", strict = " + strictly +
                 ", params = " + Arrays.asList(params));
         }

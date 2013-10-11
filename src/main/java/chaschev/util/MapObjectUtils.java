@@ -123,7 +123,11 @@ public class MapObjectUtils {
 
     public static Map<String, Object> fromJSON(Reader is){
         try {
+
+            //todo migrate to ObjectReader which is thread-safe: http://wiki.fasterxml.com/ObjectReader
             ObjectMapper mapper = new ObjectMapper();
+//            ObjectReader reader = mapper.reader();
+
 
             return mapper.readValue(is,
                     new TypeReference<Map<String, Object>>() {});
