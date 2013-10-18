@@ -7,7 +7,9 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
+import static chaschev.lang.Iterables2.projectMethod;
 import static chaschev.lang.OpenBean.*;
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -147,5 +149,30 @@ public class OpenBeanTest {
 
         assertThat(getConstructorDesc(Mock.class, true, new ArrayList(), new LinkedList())).isNull();
         assertThat(getConstructorDesc(Mock.class, true, ArrayList.class, LinkedList.class)).isNull();
+    }
+
+    public static class FieldsOfTypeTest{
+        String s1 = "Copy3s1";
+        String s2 = "Copy3s2";
+        int i = 3;
+
+        List strictField ;
+
+        ArrayList nonStrictField;
+    }
+
+    @Test
+    public void testFieldsOfType() throws Exception {
+        assertThat(
+            projectMethod(fieldsOfType(FieldsOfTypeTest.class, String.class), "getName")).containsOnly("s1", "s2");
+
+        assertThat(
+            projectMethod(fieldsOfType(FieldsOfTypeTest.class, int.class), "getName")).containsOnly("i");
+
+        assertThat(
+            projectMethod(fieldsOfType(FieldsOfTypeTest.class, List.class), "getName")).containsOnly("strictField", "nonStrictField");
+
+        assertThat(
+            projectMethod(fieldsOfType(FieldsOfTypeTest.class, List.class, true), "getName")).containsOnly("strictField");
     }
 }

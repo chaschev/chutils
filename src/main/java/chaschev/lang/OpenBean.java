@@ -4,6 +4,8 @@ import chaschev.lang.reflect.ClassDesc;
 import chaschev.lang.reflect.ConstructorDesc;
 import chaschev.lang.reflect.MethodDesc;
 import chaschev.util.Exceptions;
+import com.google.common.collect.AbstractIterator;
+import com.google.common.collect.FluentIterable;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -295,6 +297,49 @@ public class OpenBean {
 
     public static <T> ConstructorDesc<T> getConstructorDesc(Class<T> aClass, boolean strictly, Class... classes) {
         return getClassDesc(aClass).getConstructorDesc(strictly, classes);
+    }
+
+    public static Iterable<Field> fieldsOfType(Object obj, final Class<?> aClass) {
+        return fieldsOfType(obj, aClass, false);
+    }
+
+    public static Iterable<Field> fieldsOfType(Object obj, final Class<?> aClass, final boolean strict) {
+        return fieldsOfType(obj.getClass(), aClass, strict);
+    }
+
+    public static Iterable<Field> fieldsOfType(Class<?> objClass, final Class<?> fieldClass){
+        return fieldsOfType(objClass, fieldClass, false);
+    }
+
+    public static Iterable<Field> fieldsOfType(Class<?> objClass, final Class<?> fieldClass, final boolean strict){
+        final Field[] fields = getClassDesc(objClass).fields;
+
+        return new FluentIterable<Field>() {
+            @Override
+            public Iterator<Field> iterator() {
+                return new AbstractIterator<Field>() {
+                    int i = 0;
+                    final int l = fields.length;
+                    @Override
+                    protected Field computeNext() {
+                        for(;i<l;){
+                            final Field field = fields[i++];
+                            if(strict){
+                                if(field.getType() == fieldClass){
+                                    return field;
+                                }
+                            }else{
+                                if(fieldClass.isAssignableFrom(field.getType())){
+                                    return field;
+                                }
+                            }
+                        }
+
+                        return endOfData();
+                    }
+                };
+            }
+        };
     }
 
     public static final OpenBeanInstance INSTANCE = new OpenBeanInstance();
