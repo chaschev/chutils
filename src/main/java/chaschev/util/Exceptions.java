@@ -37,4 +37,12 @@ public class Exceptions {
 
         return sw.toString();
     }
+
+    public static Throwable rootCause(Throwable e){
+        while(e.getCause() != null){
+            e = e.getCause();
+        }
+
+        return e;
+    }
 }

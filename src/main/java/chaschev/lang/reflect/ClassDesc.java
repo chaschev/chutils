@@ -214,13 +214,13 @@ public class ClassDesc<T> {
         return null;
     }
 
-    private static final Comparator<MethodDesc> METHOD_COMPARATOR = new Comparator<MethodDesc>() {
+    public static final Comparator<MethodDesc> METHOD_COMPARATOR = new Comparator<MethodDesc>() {
         @Override
         public int compare(MethodDesc o1, MethodDesc o2) {
             return o1.method.getName().compareTo(o1.method.getName());
         }
     };
-    private static final Comparator<Field> FIELD_COMPARATOR = new Comparator<Field>() {
+    public static final Comparator<Field> FIELD_COMPARATOR = new Comparator<Field>() {
         @Override
         public int compare(Field o1, Field o2) {
             return o1.getName().compareTo(o2.getName());

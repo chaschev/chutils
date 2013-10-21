@@ -1,7 +1,7 @@
 package chaschev.lang;
 
 import chaschev.lang.reflect.Mock;
-import org.fest.assertions.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import java.util.List;
 
 import static chaschev.lang.Iterables2.projectMethod;
 import static chaschev.lang.OpenBean.*;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  * User: chaschev
