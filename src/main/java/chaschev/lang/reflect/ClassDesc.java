@@ -54,12 +54,14 @@ public class ClassDesc<T> {
             this.constructors[i] = new ConstructorDesc(constructor);
         }
 
-        while (aClass != Object.class) {
+        while (aClass != Object.class && aClass != null) {
             Field[] fields = aClass.getDeclaredFields();
 
             for (Field field : fields) {
                 field.setAccessible(true);
+
                 final int modifiers = field.getModifiers();
+
                 if (Modifier.isStatic(modifiers)) {
                     tempStaticFields.add(field);
                 } else {

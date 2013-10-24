@@ -34,4 +34,8 @@ public class JacksonMapper implements Mapper {
             throw Exceptions.runtime(e);
         }
     }
+
+    public ObjectMapper getMapper() {
+        return mapper;
+    }
 }

@@ -175,4 +175,9 @@ public class OpenBeanTest {
         assertThat(
             projectMethod(fieldsOfType(FieldsOfTypeTest.class, List.class, true), "getName")).containsOnly("strictField");
     }
+
+    @Test
+    public void testInterface() throws Exception {
+        methods(List.class);
+    }
 }

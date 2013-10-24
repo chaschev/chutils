@@ -20,7 +20,7 @@ public abstract class HavingMethodSignature {
         if (!checkLength(parameters)) return false;
 
         for (int i = 0, length = parameters.length; i < length; i++) {
-            if(!params[i].isAssignableFrom(parameters[i].getClass())){
+            if (!params[i].isAssignableFrom(parameters[i].getClass())) {
                 return false;
             }
         }
@@ -32,7 +32,7 @@ public abstract class HavingMethodSignature {
         if (!checkLength(parameters)) return false;
 
         for (int i = 0, length = parameters.length; i < length; i++) {
-            if(params[i] != parameters[i].getClass()){
+            if (params[i] != parameters[i].getClass()) {
                 return false;
             }
         }
@@ -44,7 +44,7 @@ public abstract class HavingMethodSignature {
         if (!checkLength(parameters)) return false;
 
         for (int i = 0, length = parameters.length; i < length; i++) {
-            if(!params[i].isAssignableFrom(parameters[i])){
+            if (!params[i].isAssignableFrom(parameters[i])) {
                 return false;
             }
         }
@@ -56,7 +56,7 @@ public abstract class HavingMethodSignature {
         return params.length == parameters.length;
     }
 
-    public abstract String getName() ;
+    public abstract String getName();
 
     @Override
     public String toString() {
@@ -67,7 +67,7 @@ public abstract class HavingMethodSignature {
         for (int i = 0; i < l; i++) {
             Class<?> param = params[i];
             sb.append(param.getSimpleName());
-            if(i-1 != l){
+            if (i != l - 1) {
                 sb.append(", ");
             }
         }
@@ -75,7 +75,7 @@ public abstract class HavingMethodSignature {
 
         boolean isMethod = this instanceof MethodDesc;
 
-        if(isMethod) sb.append(":");
+        if (isMethod) sb.append(":");
 
         sb.append(isMethod ? (((MethodDesc) this).method.getReturnType()
             .getSimpleName()) : "");

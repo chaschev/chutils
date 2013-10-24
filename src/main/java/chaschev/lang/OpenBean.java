@@ -10,6 +10,9 @@ import com.google.common.collect.FluentIterable;
 import java.lang.reflect.Field;
 import java.util.*;
 
+import static chaschev.lang.Lists2.projectMethod;
+import static java.util.Arrays.asList;
+
 /**
  * User: chaschev
  * Date: 5/20/13
@@ -340,6 +343,22 @@ public class OpenBean {
                 };
             }
         };
+    }
+
+    public static List<String> fieldNames(Class<?> aClass){
+        return projectMethod(fields(aClass), Field.class, String.class, "getName");
+    }
+
+    public static List<Field> fields(Class<?> aClass) {
+        return asList(getClassDesc(aClass).fields);
+    }
+
+    public static List<String> methodNames(Class<?> aClass){
+        return projectMethod(methods(aClass), MethodDesc.class, String.class, "getName");
+    }
+
+    public static List<MethodDesc> methods(Class<?> aClass) {
+        return asList(getClassDesc(aClass).methods);
     }
 
     public static final OpenBeanInstance INSTANCE = new OpenBeanInstance();
