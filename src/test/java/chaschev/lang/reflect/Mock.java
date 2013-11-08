@@ -20,4 +20,16 @@ public class Mock {
     public Mock(List l1) {
         c = 3;
     }
+
+    public Mock(int c) {
+        this.c = 4;
+    }
+
+    public Mock(String s, int c) {
+        this.c = 5;
+    }
+
+    public Mock(Double d) {
+        this.c = 6;
+    }
 }

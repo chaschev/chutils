@@ -1,5 +1,7 @@
 package chaschev.lang.reflect;
 
+import com.google.common.primitives.Primitives;
+
 import java.util.Arrays;
 
 /**
@@ -20,7 +22,9 @@ public abstract class HavingMethodSignature {
         if (!checkLength(parameters)) return false;
 
         for (int i = 0, length = parameters.length; i < length; i++) {
-            if (!params[i].isAssignableFrom(parameters[i].getClass())) {
+            final boolean matches = _matches(parameters[i].getClass(), params[i]);
+
+            if(!matches) {
                 return false;
             }
         }
@@ -44,12 +48,28 @@ public abstract class HavingMethodSignature {
         if (!checkLength(parameters)) return false;
 
         for (int i = 0, length = parameters.length; i < length; i++) {
-            if (!params[i].isAssignableFrom(parameters[i])) {
+            final boolean matches = _matches(parameters[i], params[i]);
+
+            if(!matches) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    private static boolean _matches(Class inputParam, Class<?> declaredParam) {
+        boolean matches = true;
+        if (!declaredParam.isAssignableFrom(inputParam)) {
+            if(
+                (inputParam.isPrimitive() && Primitives.wrap(inputParam) == declaredParam) ||
+                (declaredParam.isPrimitive() && Primitives.wrap(declaredParam) == inputParam)
+                ){
+            }else{
+                matches = false;
+            }
+        }
+        return matches;
     }
 
     private boolean checkLength(Object[] parameters) {

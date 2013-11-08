@@ -1,7 +1,6 @@
 package chaschev.lang;
 
 import chaschev.lang.reflect.Mock;
-import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -132,7 +131,9 @@ public class OpenBeanTest {
 
     @Test
     public void testNewInstance() throws Exception {
-        Assertions.assertThat(newInstance(Mock.class, new ArrayList()).c).isEqualTo(1);
+        assertThat(newInstance(Mock.class, false, "test", 15).c).isEqualTo(5);
+
+        assertThat(newInstance(Mock.class, new ArrayList()).c).isEqualTo(1);
         assertThat(newInstance(Mock.class, true, new ArrayList()).c).isEqualTo(1);
         assertThat(newInstance(Mock.class, false, new LinkedList()).c).isEqualTo(3);
         assertThat(newInstance(Mock.class, new LinkedList()).c).isEqualTo(3);

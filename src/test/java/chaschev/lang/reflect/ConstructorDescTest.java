@@ -62,5 +62,23 @@ public class ConstructorDescTest {
         assertThat(
             new ConstructorDesc(Mock.class.getConstructor(List.class, ArrayList.class)).matches(new ArrayList())
         ).isFalse();
+
+        //boxing
+
+        assertThat(
+            new ConstructorDesc(Mock.class.getConstructor(int.class)).matches(int.class)
+        ).isTrue();
+
+        assertThat(
+            new ConstructorDesc(Mock.class.getConstructor(int.class)).matches(Integer.class)
+        ).isTrue();
+
+        assertThat(
+            new ConstructorDesc(Mock.class.getConstructor(Double.class)).matches(double.class)
+        ).isTrue();
+
+        assertThat(
+            new ConstructorDesc(Mock.class.getConstructor(String.class, int.class)).matches(String.class, Integer.class)
+        ).isTrue();
     }
 }

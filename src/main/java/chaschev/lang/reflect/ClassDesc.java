@@ -12,7 +12,7 @@ import java.util.*;
 /**
 * @author Andrey Chaschev chaschev@gmail.com
 */
-public class ClassDesc<T> {
+public final class ClassDesc<T> {
     private static final Map<Class, ClassDesc> CLASS_DESC_MAP = new HashMap<Class, ClassDesc>();
     Class<T> aClass;
 

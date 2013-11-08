@@ -44,4 +44,8 @@ public class JOptOptions {
     public boolean has(OptionSpec<?> optionSpec) {
         return optionSet.has(optionSpec);
     }
+
+    public OptionSet getOptionSet() {
+        return optionSet;
+    }
 }
