@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class Iterables2 {
     public static <F, T> Iterable<T> projectField(Iterable<F> fromIterable, Class<F> elClass, Class<T> fieldClass, String name) {
-        Function<F, T> field = (Function<F, T>) Functions2.field(elClass, name);
+        Function<F, T> field = (Function<F, T>) Functions2.field(name);
         return Iterables.transform(fromIterable, field);
     }
 
@@ -37,7 +37,7 @@ public class Iterables2 {
     }
 
     public static <F, T> Iterable<T> projectMethod(Iterable<F> fromIterable, Class<F> elClass, Class<T> methodReturnClass, String name) {
-        Function<F, T> field = (Function<F, T>) Functions2.method(elClass, name);
+        Function<F, T> field = (Function<F, T>) Functions2.method(name);
         return Iterables.transform(fromIterable, field);
     }
 

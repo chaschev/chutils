@@ -14,19 +14,27 @@ import java.lang.reflect.Method;
  */
 public class Functions2 {
     @SuppressWarnings("unchecked")
-    public static <K> Function<K, Object> field(Class<K> elementClass, String fieldName){
-        final Field field = OpenBean.getClassDesc(elementClass).getField(fieldName);
+    public static <OBJECT, FIELD> Function<OBJECT, FIELD> field(final String fieldName){
+        final Field[] field = new Field[1];
 
-        Preconditions.checkNotNull(field, "no such field: " + fieldName);
-
-        return new Function<K, Object>() {
-            public Object apply(@Nullable K input) {
+        return new Function<OBJECT, FIELD>() {
+            public FIELD apply(@Nullable OBJECT input) {
                 if(input == null){
                     return null;
                 }else{
+                    Field _field = field[0];
+
+                    if(_field == null){
+                        _field = OpenBean.getClassDesc(input.getClass()).getField(fieldName);
+
+                        Preconditions.checkNotNull(_field, "no such field: " + fieldName);
+
+                        field[0] = _field;
+                    }
+
                     try {
-                        return field.get(input);
-                    } catch (IllegalAccessException e) {
+                        return (FIELD) _field.get(input);
+                    } catch (Exception e) {
                         throw Exceptions.runtime(e);
                     }
                 }
@@ -35,20 +43,26 @@ public class Functions2 {
     }
 
     @SuppressWarnings("unchecked")
-    public static <K> Function<K, Object> method(Class<K> elementClass, String methodName){
-        MethodDesc methodDesc = OpenBean.getClassDesc(elementClass).getMethodDesc(methodName, true);
+    public static <OBJECT, RETURN> Function<OBJECT, RETURN> method(final String methodName){
+        final Method[] method = new Method[1]; 
 
-        Preconditions.checkNotNull(methodDesc, "no such method: " + methodName);
-
-        final Method method = methodDesc.getMethod();
-
-        return new Function<K, Object>() {
-            public Object apply(@Nullable K input) {
+        return new Function<OBJECT, RETURN>() {
+            public RETURN apply(@Nullable OBJECT input) {
                 if(input == null){
                     return null;
                 }else{
+                    Method _method = method[0];
+
+                    if(_method == null){
+                        MethodDesc methodDesc = OpenBean.getClassDesc(input.getClass()).getMethodDesc(methodName, true);
+
+                        Preconditions.checkNotNull(methodDesc, "no such method: " + methodName);
+
+                        _method = method[0] = methodDesc.getMethod();
+                    }
+                    
                     try {
-                        return method.invoke(input);
+                        return (RETURN) _method.invoke(input);
                     } catch (Exception e) {
                         throw Exceptions.runtime(e);
                     }

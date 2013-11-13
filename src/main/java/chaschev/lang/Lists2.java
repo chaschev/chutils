@@ -13,12 +13,12 @@ import java.util.List;
  */
 public class Lists2 {
     public static <F, T> List<T> projectField(List<F> fromList, Class<F> elClass, Class<T> fieldClass, String name) {
-        Function<F, T> field = (Function<F, T>) Functions2.field(elClass, name);
+        Function<F, T> field = (Function<F, T>) Functions2.field(name);
         return Lists.transform(fromList, field);
     }
 
     public static <F, T> List<T> projectMethod(List<F> fromList, Class<F> elClass, Class<T> methodClass, String name) {
-        Function<F, T> method = (Function<F, T>) Functions2.method(elClass, name);
+        Function<F, T> method = (Function<F, T>) Functions2.method(name);
         return Lists.transform(fromList, method);
     }
 

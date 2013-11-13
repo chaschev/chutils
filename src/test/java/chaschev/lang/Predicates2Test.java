@@ -12,21 +12,21 @@ import static org.fest.assertions.api.Assertions.assertThat;
  * @author Andrey Chaschev chaschev@gmail.com
  */
 public class Predicates2Test {
-    class  Foo{
+    public static class  Foo{
         String name;
 
-        Foo(String name) {
+        public Foo(String name) {
             this.name = name;
         }
 
-        String getName() {
+        public String getName() {
             return name;
         }
     }
     @Test
     public void testMethodEquals() throws Exception {
         Foo a = new Foo("a");
-        assertThat(find(newArrayList(a, new Foo("b")), methodEquals("a", "getName"))).isEqualTo(a);
+        assertThat(find(newArrayList(a, new Foo("b")), methodEquals("getName", "a"))).isEqualTo(a);
         assertThat(find(newArrayList(a, new Foo("b")), fieldEquals("name", "a"))).isEqualTo(a);
     }
 }
