@@ -27,6 +27,6 @@ public class Predicates2Test {
     public void testMethodEquals() throws Exception {
         Foo a = new Foo("a");
         assertThat(find(newArrayList(a, new Foo("b")), methodEquals("a", "getName"))).isEqualTo(a);
-        assertThat(find(newArrayList(a, new Foo("b")), fieldEquals("a", "name"))).isEqualTo(a);
+        assertThat(find(newArrayList(a, new Foo("b")), fieldEquals("name", "a"))).isEqualTo(a);
     }
 }
