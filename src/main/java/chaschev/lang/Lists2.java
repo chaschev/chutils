@@ -2,9 +2,11 @@ package chaschev.lang;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
+import com.google.common.base.Supplier;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
+import java.util.AbstractList;
 import java.util.Collections;
 import java.util.List;
 
@@ -54,4 +56,58 @@ public class Lists2 {
         return projectMethod(fromList, aClass, null, name);
     }
 
+    public static <T> List<T> removeDupsInSortedList(List<T> list) {
+        int w = 0;
+        for (int r = 0, listSize = list.size(); r < listSize; r++) {
+            if (r == 0) {
+                w++;
+                continue;
+            }
+
+            if (!list.get(r).equals(list.get(r - 1))) {
+                list.set(w, list.get(r));
+                w++;
+            }
+        }
+
+        for (int last = list.size() - 1; last >= w; last--) {
+            list.remove(last);
+        }
+
+        return list;
+    }
+
+    public static <T> List<T> newFilledArrayList(int size, T value) {
+        List<T> list = Lists.newArrayListWithExpectedSize(size);
+
+        for (int i = 0; i < size; i++) {
+            list.add(value);
+        }
+
+        return list;
+    }
+
+    public static <T> List<T> nInstances(int n, Supplier<T> supplier){
+        List<T> list = Lists.newArrayListWithCapacity(n);
+
+        for(int i = 0; i < n; i++){
+            list.add(supplier.get());
+        }
+
+        return list;
+    }
+
+    public static <T> List<T> computingList(final int n, final Function<Integer, T> function){
+        return new AbstractList<T>() {
+            @Override
+            public T get(int index) {
+                return function.apply(index);
+            }
+
+            @Override
+            public int size() {
+                return n;
+            }
+        };
+    }
 }

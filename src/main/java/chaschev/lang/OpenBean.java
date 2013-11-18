@@ -4,6 +4,7 @@ import chaschev.lang.reflect.ClassDesc;
 import chaschev.lang.reflect.ConstructorDesc;
 import chaschev.lang.reflect.MethodDesc;
 import chaschev.util.Exceptions;
+import com.google.common.base.Optional;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.FluentIterable;
 
@@ -57,7 +58,7 @@ public class OpenBean {
 
     public static Object getFieldValue(Object object, String fieldName) {
         try {
-            return getField(object, fieldName).get(object);
+            return _getField(object, fieldName).get(object);
         } catch (IllegalAccessException e) {
             throw Exceptions.runtime(e);
         }
@@ -65,7 +66,7 @@ public class OpenBean {
 
     public static Object getOrInitCollection(Object object, String fieldName) {
         try {
-            final Field collectionField = getField(object, fieldName);
+            final Field collectionField = _getField(object, fieldName);
 
             final Class<?> aClass = collectionField.getType();
 
@@ -91,13 +92,22 @@ public class OpenBean {
         }
     }
 
-    public static Field getField(Object object, String fieldName) {
+    public static Optional<Field> getField(Object object, String fieldName) {
+        return Optional.fromNullable(_getField(object, fieldName));
+    }
+
+    private static Field _getField(Object object, String fieldName) {
         return getClassDesc(object.getClass()).getField(fieldName);
+    }
+
+    public static Optional<MethodDesc> getMethod(Object object, String methodName, Object... params) {
+        MethodDesc methodDesc = getClassDesc(object.getClass()).getMethodDesc(methodName, false, params);
+        return  Optional.fromNullable(methodDesc);
     }
 
     public static void setField(Object object, String fieldName, Object value) {
         try {
-            getField(object, fieldName).set(object, value);
+            _getField(object, fieldName).set(object, value);
         } catch (IllegalAccessException e) {
             throw Exceptions.runtime(e);
         }

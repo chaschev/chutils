@@ -151,7 +151,21 @@ public class OpenStringBuilder implements Appendable, CharSequence {
         return new String(buf, 0, size());
     }
 
-    public OpenStringBuilder trimEnd() {
+    public OpenStringBuilder trim() {
+        int i = 0;
+
+        for (; i < len && Character.isWhitespace(buf[i]); i++) {
+        }
+
+        if(i != 0 && i< len){
+            System.arraycopy(buf, i, buf, 0, len - i);
+            this.len = len - i;
+        }
+
+        return trimEnd();
+    }
+
+    private OpenStringBuilder trimEnd() {
         int i = len - 1;
 
         for (; i >= 0 && Character.isWhitespace(buf[i]); i--) {

@@ -1,5 +1,7 @@
 package chaschev.lang;
 
+import chaschev.lang.reflect.ClassDesc;
+import chaschev.lang.reflect.ConstructorDesc;
 import chaschev.lang.reflect.MethodDesc;
 import chaschev.util.Exceptions;
 import com.google.common.base.Function;
@@ -13,6 +15,44 @@ import java.lang.reflect.Method;
  * @author Andrey Chaschev chaschev@gmail.com
  */
 public class Functions2 {
+
+    public static <T> ObjectMethod<T> constructor(final Class<T> aClass, final Class... params){
+        return new ObjectMethod<T>() {
+            private final ConstructorDesc<T> constructor = OpenBean.getClassDesc(aClass).getConstructorDesc(false, params);
+
+            @Override
+            public T create(Object... params) {
+                return constructor.newInstance(params);
+            }
+        };
+    }
+
+    public static <T> ObjectMethod<T> method(final Object obj, final String method, final Class... params){
+        return method(obj, method, false, params);
+    }
+
+    public static <T> ObjectMethod<T> method(final Object obj, final String method, final boolean strictly, final Class... params){
+        return new ObjectMethod<T>() {
+            private final MethodDesc methodDesc = OpenBean.getClassDesc(obj.getClass()).getMethodDesc(method, strictly, params);
+
+            @Override
+            public T create(Object... params) {
+                return (T) methodDesc.invoke(obj, params);
+            }
+        };
+    }
+
+    public static <T> ObjectMethod<T> dynamicConstructor(final Class<T> aClass){
+        return new ObjectMethod<T>() {
+            private final ClassDesc<T> classDesc = OpenBean.getClassDesc(aClass);
+
+            @Override
+            public T create(Object... params) {
+                return classDesc.getConstructorDesc(false, params).newInstance(params);
+            }
+        };
+    }
+
     @SuppressWarnings("unchecked")
     public static <OBJECT, FIELD> Function<OBJECT, FIELD> field(final String fieldName){
         final Field[] field = new Field[1];

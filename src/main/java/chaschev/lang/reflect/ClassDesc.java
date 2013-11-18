@@ -160,6 +160,10 @@ public final class ClassDesc<T> {
         return (MethodDesc) findSignature(name, strictly, methods, parameters);
     }
 
+    public MethodDesc getMethodDesc(String name,final boolean strictly, Class... parameters) {
+        return (MethodDesc) findSignature(name, strictly, methods, parameters);
+    }
+
     public MethodDesc getStaticMethodDesc(String name, final boolean strictly, Object... parameters) {
         return (MethodDesc) findSignature(name, strictly, staticMethods, parameters);
     }

@@ -1,10 +1,11 @@
 package chaschev.lang;
 
-import com.google.common.collect.Lists;
+import chaschev.util.Exceptions;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
+import java.lang.reflect.Field;
 
 /**
  * @author Andrey Chaschev chaschev@gmail.com
@@ -15,34 +16,21 @@ public class LangUtils {
         return operand == null ? fallbackTo : operand;
     }
 
-    public static <T> List<T> removeDupsInSortedList(List<T> list) {
-        int w = 0;
-        for (int r = 0, listSize = list.size(); r < listSize; r++) {
-            if (r == 0) {
-                w++;
-                continue;
-            }
+    @SuppressWarnings("restriction")
+    public static sun.misc.Unsafe getUnsafe() {
+        try {
 
-            if (!list.get(r).equals(list.get(r - 1))) {
-                list.set(w, list.get(r));
-                w++;
-            }
+            Field singleoneInstanceField = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
+            singleoneInstanceField.setAccessible(true);
+            return (sun.misc.Unsafe) singleoneInstanceField.get(null);
+        } catch (Exception e) {
+            System.err.println("could not get unsafe!");
+            e.printStackTrace(System.err);
+
+            LoggerFactory.getLogger(OpenBean.class).error("could not get unsafe!", e);
+
+            throw Exceptions.runtime(e);
         }
-
-        for (int last = list.size() - 1; last >= w; last--) {
-            list.remove(last);
-        }
-
-        return list;
     }
 
-    public static <T> List<T> newFilledArrayList(int size, T value) {
-        List<T> list = Lists.newArrayListWithExpectedSize(size);
-
-        for (int i = 0; i < size; i++) {
-            list.add(value);
-        }
-
-        return list;
-    }
 }

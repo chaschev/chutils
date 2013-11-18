@@ -16,7 +16,7 @@ public class MethodDesc extends HavingMethodSignature {
         method.setAccessible(true);
     }
 
-    public Object invoke(Object object, Object[] params) {
+    public Object invoke(Object object, Object... params) {
         try {
             return method.invoke(object, params);
         } catch (Exception e) {
