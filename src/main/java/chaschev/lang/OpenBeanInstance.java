@@ -3,6 +3,7 @@ package chaschev.lang;
 import chaschev.lang.reflect.ClassDesc;
 import chaschev.lang.reflect.ConstructorDesc;
 import chaschev.util.Exceptions;
+import com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +22,7 @@ public final class OpenBeanInstance {
         return OpenBean.putAll(dest, src);
     }
 
-    public Field getField(Object object, String fieldName) {
+    public Optional<Field> getField(Object object, String fieldName) {
         return OpenBean.getField(object, fieldName);
     }
 

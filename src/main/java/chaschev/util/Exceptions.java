@@ -26,6 +26,10 @@ public class Exceptions {
             return (RuntimeException)e;
         }
 
+        if (e instanceof Error) {
+            throw (Error) e;
+        }
+
         return new RuntimeException(e);
     }
     public static Error runtime(Error e) {
