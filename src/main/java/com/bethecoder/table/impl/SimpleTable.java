@@ -339,11 +339,6 @@ public class SimpleTable implements AsciiTable {
 		int maxLength;
 		
 		for (int i = 0 ; i < colCount ; i ++) {
-            if(headerObjs[i].maxWidth() != 0){
-                colMaxLenList.add(headerObjs[i].maxWidth());
-                continue;
-            }
-
 			colData = new ArrayList<String>();
 			
 			if (header != null && i < header.length) {
@@ -359,7 +354,12 @@ public class SimpleTable implements AsciiTable {
             }
 			
 			maxLength = getMaxItemLength(colData);
-			colMaxLenList.add(maxLength);
+
+            if(headerObjs[i].maxWidth() != 0){
+                maxLength = Math.min(maxLength, headerObjs[i].maxWidth());
+            }
+
+            colMaxLenList.add(maxLength);
 		}
 		
 		return colMaxLenList;

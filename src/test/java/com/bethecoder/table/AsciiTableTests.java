@@ -26,6 +26,8 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.bethecoder.table.ASCIITableHeader.h;
+
 /**
  * ASCII Table test cases.
  * 
@@ -65,11 +67,11 @@ public class AsciiTableTests {
 	    //ASCIITable.getInstance().printTable(header, data, ASCIITable.ALIGN_LEFT);
 	    
 	    ASCIITableHeader[] headerObjs = {
-	    		new ASCIITableHeader("User Name", AsciiTableInstance.ALIGN_LEFT),
-	    		new ASCIITableHeader("Salary"),
-	    		new ASCIITableHeader("Designation", AsciiTableInstance.ALIGN_CENTER),
-	    		new ASCIITableHeader("Address", AsciiTableInstance.ALIGN_LEFT).maxWidth(40),
-	    		new ASCIITableHeader("Lucky#", AsciiTableInstance.ALIGN_RIGHT),
+            h("User Name"),
+            h("Salary"),
+            h("Designation", AsciiTableInstance.ALIGN_CENTER),
+            h("Address").maxWidth(40),
+            h("Lucky#", AsciiTableInstance.ALIGN_RIGHT),
 	    };
 	    
 	    AsciiTableInstance.instance.printTable(headerObjs, data);

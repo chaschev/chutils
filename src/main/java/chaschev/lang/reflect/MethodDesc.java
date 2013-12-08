@@ -2,6 +2,7 @@ package chaschev.lang.reflect;
 
 import chaschev.util.Exceptions;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -19,7 +20,11 @@ public class MethodDesc extends HavingMethodSignature {
     public Object invoke(Object object, Object... params) {
         try {
             return method.invoke(object, params);
-        } catch (Exception e) {
+        }
+        catch (InvocationTargetException e){
+            throw Exceptions.runtime(e.getCause());
+        }
+        catch (Exception e) {
             throw Exceptions.runtime(e);
         }
     }

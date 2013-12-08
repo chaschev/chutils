@@ -22,6 +22,10 @@ public class MutableSupplier<T> implements Supplier<T> {
         return instance;
     }
 
+    public boolean isFinalized(){
+        return finalized;
+    }
+
     public MutableSupplier<T> setInstance(T instance) {
         if(!finalized){
             this.instance = instance;
