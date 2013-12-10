@@ -1,5 +1,6 @@
 package chaschev.io;
 
+import chaschev.lang.LangUtils;
 import org.apache.commons.io.IOUtils;
 
 import javax.annotation.Nullable;
@@ -109,7 +110,7 @@ public class FileUtils {
             final int unitInt = si ? 1000 : 1024;
             if (bytes < unitInt) {
                 this.count = bytes;
-                unit = (addByte ? " B" : "");
+                unit = (addByte ? "B" : "");
                 return;
             }
 
@@ -120,11 +121,12 @@ public class FileUtils {
             unit = pre + (addByte ? "B" : "");
         }
 
-        public String toString(int fractionLength) {
-            return String.format("%." +
-                fractionLength +
-                "f %s", count, unit);
-        }
+
+         public String toString(int fractionLength) {
+            String s = LangUtils.toConciseString(count, fractionLength);
+
+             return unit.isEmpty() ? s : s + unit;
+         }
 
         @Override
         public String toString() {
