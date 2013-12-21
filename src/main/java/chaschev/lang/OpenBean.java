@@ -8,7 +8,9 @@ import com.google.common.base.Optional;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.FluentIterable;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
 
 import static chaschev.lang.Lists2.projectMethod;
@@ -54,6 +56,20 @@ public class OpenBean {
 
     public static <T> ClassDesc<T> getClassDesc(Class<T> aClass) {
         return ClassDesc.getClassDesc(aClass);
+    }
+
+    public static <T> Optional<T> getFieldValue(Object object, String fieldName, Class<T> tClass) {
+        try {
+            Field field = _getField(object, fieldName);
+
+            if(field == null){
+                return Optional.absent();
+            }
+
+            return Optional.of((T)field.get(object));
+        } catch (IllegalAccessException e) {
+            throw Exceptions.runtime(e);
+        }
     }
 
     public static Object getFieldValue(Object object, String fieldName) {
@@ -279,7 +295,7 @@ public class OpenBean {
         }
     }
 
-    public static <T> T newInstance(Class<T> aClass, Object... params) {
+    public static <T> T newInstance(Class<? extends T> aClass, Object... params) {
         return newInstance(aClass, false, params);
     }
 
@@ -322,6 +338,34 @@ public class OpenBean {
 
     public static Iterable<Field> fieldsOfType(Class<?> objClass, final Class<?> fieldClass){
         return fieldsOfType(objClass, fieldClass, false);
+    }
+
+    public static <T> List<MethodDesc<? extends T>> methodsReturning(Object obj, final Class<? extends T> returnClass){
+        return methodsReturning(obj.getClass(), returnClass);
+    }
+
+    public static <T> List<MethodDesc<? extends T>> methodsReturning(Class<?> objClass, final Class<? extends T> returnClass){
+        return methodsReturning(objClass, returnClass, false);
+    }
+
+    public static <T> List<MethodDesc<? extends T>> methodsReturning(Class<?> objClass, final Class<? extends T> returnClass, boolean strict){
+        List<MethodDesc<? extends T>> result = new ArrayList<MethodDesc<? extends T>>(4);
+
+        for (MethodDesc method : getClassDesc(objClass).methods) {
+            Class<?> actualReturnType = method.getMethod().getReturnType();
+
+            if(!strict){
+                if(returnClass.isAssignableFrom(actualReturnType)){
+                    result.add(method);
+                }
+            }else{
+                if(returnClass ==actualReturnType) {
+                    result.add(method);
+                }
+            }
+        }
+
+        return result;
     }
 
     public static Iterable<Field> fieldsOfType(Class<?> objClass, final Class<?> fieldClass, final boolean strict){
@@ -371,5 +415,7 @@ public class OpenBean {
         return asList(getClassDesc(aClass).methods);
     }
 
+
     public static final OpenBeanInstance INSTANCE = new OpenBeanInstance();
+
 }

@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 /**
 * @author Andrey Chaschev chaschev@gmail.com
 */
-public class MethodDesc extends HavingMethodSignature {
+public class MethodDesc<T> extends HavingMethodSignature {
     protected final Method method;
 
     public MethodDesc(Method method) {
@@ -17,9 +17,9 @@ public class MethodDesc extends HavingMethodSignature {
         method.setAccessible(true);
     }
 
-    public Object invoke(Object object, Object... params) {
+    public T invoke(Object object, Object... params) {
         try {
-            return method.invoke(object, params);
+            return (T) method.invoke(object, params);
         }
         catch (InvocationTargetException e){
             throw Exceptions.runtime(e.getCause());
