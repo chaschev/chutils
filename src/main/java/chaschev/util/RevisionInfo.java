@@ -17,6 +17,22 @@ import java.util.Properties;
  * @author Andrey Chaschev chaschev@gmail.com
  */
 public class RevisionInfo {
+    public static enum Env {
+        development, production, test;
+        public String concise(){
+            switch (this) {
+                case development:
+                    return "dev";
+                case production:
+                    return "prod";
+                case test:
+                    return "test";
+            }
+
+            throw new IllegalStateException();
+        }
+    }
+
     private static org.slf4j.Logger logger = LoggerFactory.getLogger(RevisionInfo.class);
 
     private String artifactId;
@@ -28,6 +44,9 @@ public class RevisionInfo {
     private volatile static RevisionInfo instance;
 
     private final Class aClass;
+    private final Properties props = new Properties();
+
+    private Env env;
 
     public RevisionInfo() {
         aClass = null;
@@ -44,7 +63,6 @@ public class RevisionInfo {
 
         InputStream is = null;
         try {
-            final Properties props = new Properties();
 
             is = aClass.getResourceAsStream("/" + moduleName + ".properties");
             props.load(is);
@@ -53,6 +71,7 @@ public class RevisionInfo {
             version = props.getProperty("project.version");
             buildTimestamp = props.getProperty("project.buildTimestamp");
             artifactId = props.getProperty("project.artifactId");
+            env = Env.valueOf(props.getProperty("project.env",  "production"));
         } catch (Exception e) {
             logger.warn("Failed to read " + moduleName + ".properties", e);
             revision = "<No revision info available>";
@@ -80,11 +99,11 @@ public class RevisionInfo {
 
     @Override
     public String toString() {
-        return String.format("%s v%s r%s %s", artifactId, version, revision, getBuildDate());
+        return String.format("%s v%s-%s r%s %s", artifactId, getEnvironment().concise(), version, revision, getBuildDate());
     }
 
     public String toShortString() {
-        return String.format("%s v%s %s", artifactId, version, getBuildDate());
+        return String.format("%s v%s", artifactId, version);
     }
 
     public String getBuildDate() {
@@ -105,6 +124,22 @@ public class RevisionInfo {
         }
 
         return instance;
+    }
+
+    public boolean isDevelopment(){
+        return env == Env.development;
+    }
+
+    public boolean isProduction(){
+        return env == Env.production;
+    }
+
+    public boolean isTest(){
+        return env == Env.test;
+    }
+
+    public Env getEnvironment() {
+        return env;
     }
 
     public static void main(String[] args) {
