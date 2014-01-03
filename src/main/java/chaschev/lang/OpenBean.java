@@ -253,7 +253,7 @@ public class OpenBean {
 
     public static Object invokeStatic(Class aClass, String name, Object... args) {
         try {
-            final MethodDesc method = OpenBean.getClassDesc(aClass).getStaticMethodDesc(name, false, true);
+            final MethodDesc method = OpenBean.getClassDesc(aClass).getStaticMethodDesc(name, false);
 
             if (method == null) {
                 throw new RuntimeException("no such method '" + name + "' " + " in class " + aClass);
