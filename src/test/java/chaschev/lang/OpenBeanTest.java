@@ -131,25 +131,25 @@ public class OpenBeanTest {
 
     @Test
     public void testNewInstance() throws Exception {
-        assertThat(newInstance(Mock.class, false, "test", 15).c).isEqualTo(5);
+        assertThat(newInstance(Mock.class, "test", 15).c).isEqualTo(5);
 
         assertThat(newInstance(Mock.class, new ArrayList()).c).isEqualTo(1);
-        assertThat(newInstance(Mock.class, true, new ArrayList()).c).isEqualTo(1);
-        assertThat(newInstance(Mock.class, false, new LinkedList()).c).isEqualTo(3);
+        assertThat(newInstanceStrict(Mock.class, new ArrayList()).c).isEqualTo(1);
+        assertThat(newInstance(Mock.class, new LinkedList()).c).isEqualTo(3);
         assertThat(newInstance(Mock.class, new LinkedList()).c).isEqualTo(3);
         assertThat(newInstance(Mock.class, new LinkedList(), new ArrayList()).c).isEqualTo(2);
 
-        assertThat(getConstructorDesc(Mock.class, true, new LinkedList())).isNull();
-        assertThat(getConstructorDesc(Mock.class, true, LinkedList.class)).isNull();
-
-        assertThat(getConstructorDesc(Mock.class, false, new LinkedList())).isNotNull();
-        assertThat(getConstructorDesc(Mock.class, false, LinkedList.class)).isNotNull();
+        assertThat(getConstructorDescStrict(Mock.class, new LinkedList())).isNull();
+        assertThat(getConstructorDescStrict(Mock.class, LinkedList.class)).isNull();
 
         assertThat(getConstructorDesc(Mock.class, new LinkedList())).isNotNull();
         assertThat(getConstructorDesc(Mock.class, LinkedList.class)).isNotNull();
 
-        assertThat(getConstructorDesc(Mock.class, true, new ArrayList(), new LinkedList())).isNull();
-        assertThat(getConstructorDesc(Mock.class, true, ArrayList.class, LinkedList.class)).isNull();
+        assertThat(getConstructorDesc(Mock.class, new LinkedList())).isNotNull();
+        assertThat(getConstructorDesc(Mock.class, LinkedList.class)).isNotNull();
+
+        assertThat(getConstructorDescStrict(Mock.class, new ArrayList(), new LinkedList())).isNull();
+        assertThat(getConstructorDescStrict(Mock.class, ArrayList.class, LinkedList.class)).isNull();
     }
 
     public static class FieldsOfTypeTest{

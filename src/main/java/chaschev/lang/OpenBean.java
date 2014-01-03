@@ -8,9 +8,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.FluentIterable;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.*;
 
 import static chaschev.lang.Lists2.projectMethod;
@@ -280,14 +278,14 @@ public class OpenBean {
     }
 
     public static Object newByClass(String className, Object... params) {
-        try {
-            return newInstance(Class.forName(className), params);
-        } catch (ClassNotFoundException e) {
-            throw Exceptions.runtime(e);
-        }
+        return newByClass(className, false, params);
     }
 
-    public static Object newByClass(String className, boolean strictly, Object... params) {
+    public static Object newByClassStrict(String className, Object... params) {
+        return newByClass(className, true, params);
+    }
+
+    private static Object newByClass(String className, boolean strictly, Object... params) {
         try {
             return newInstance(Class.forName(className), strictly, params);
         } catch (ClassNotFoundException e) {
@@ -299,7 +297,11 @@ public class OpenBean {
         return newInstance(aClass, false, params);
     }
 
-    public static <T> T newInstance(Class<T> aClass, boolean strictly, Object... params){
+    public static <T> T newInstanceStrict(Class<T> aClass, Object... params){
+        return newInstance(aClass, true, params);
+    }
+
+    private static <T> T newInstance(Class<T> aClass, boolean strictly, Object... params){
         ConstructorDesc<T> desc = getConstructorDesc(aClass, strictly, params);
 
         if(desc == null){
@@ -316,7 +318,11 @@ public class OpenBean {
         return getConstructorDesc(aClass, false, params);
     }
 
-    public static <T> ConstructorDesc<T> getConstructorDesc(Class<T> aClass, boolean strictly, Object... params) {
+    public static <T> ConstructorDesc<T> getConstructorDescStrict(Class<T> aClass, Object... params) {
+        return getConstructorDesc(aClass, true, params);
+    }
+
+    private static <T> ConstructorDesc<T> getConstructorDesc(Class<T> aClass, boolean strictly, Object... params) {
         return getClassDesc(aClass).getConstructorDesc(strictly, params);
     }
 
@@ -324,7 +330,11 @@ public class OpenBean {
         return getConstructorDesc(aClass, false, classes);
     }
 
-    public static <T> ConstructorDesc<T> getConstructorDesc(Class<T> aClass, boolean strictly, Class... classes) {
+    public static <T> ConstructorDesc<T> getConstructorDescStrict(Class<T> aClass, Class... classes) {
+        return getConstructorDesc(aClass, true, classes);
+    }
+
+    private static <T> ConstructorDesc<T> getConstructorDesc(Class<T> aClass, boolean strictly, Class... classes) {
         return getClassDesc(aClass).getConstructorDesc(strictly, classes);
     }
 
@@ -416,6 +426,5 @@ public class OpenBean {
     }
 
 
-    public static final OpenBeanInstance INSTANCE = new OpenBeanInstance();
 
 }
