@@ -206,15 +206,23 @@ public final class ClassDesc<T> {
                 }
             }
         } else {
+            HavingMethodSignature matchingSignature = null;
+
             for (HavingMethodSignature signature : methodSignatures) {
                 if(name != null && !name.equals(signature.getName())){
                     continue;
                 }
 
                 if (signature.matches(parameters)) {
-                    return signature;
+                    matchingSignature = signature;
+
+                    if(signature.matchesStrictly(parameters)) {
+                        return signature;
+                    }
                 }
             }
+
+            return matchingSignature;
         }
 
         return null;
