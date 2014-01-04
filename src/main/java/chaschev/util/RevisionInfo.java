@@ -99,7 +99,7 @@ public class RevisionInfo {
 
     @Override
     public String toString() {
-        return String.format("%s v%s-%s r%s %s", artifactId, getEnvironment().concise(), version, revision, getBuildDate());
+        return String.format("%s v%s-%s r%s %s", artifactId, version, getEnvironment().concise(), revision, getBuildDate());
     }
 
     public String toShortString() {
