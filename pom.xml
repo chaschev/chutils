@@ -10,7 +10,7 @@
 
     <groupId>com.chaschev</groupId>
     <artifactId>chutils</artifactId>
-    <version>1.4</version>
+    <version>1.5-SNAPSHOT</version>
 
     <scm>
         <connection>scm:git:git@github.com:chaschev/chutils.git</connection>
